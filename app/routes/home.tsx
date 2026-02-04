@@ -21,11 +21,12 @@ export default function Home() {
   const [selectedStore, setSelectedStore] = useState<StoreFeature | null>(null);
   useEffect(() => {
     // Set your Mapbox access token
-    mapboxgl.accessToken =
-      'pk.eyJ1IjoiYWswMDciLCJhIjoiY2xkOW82MXkyMGE4aDNwc3o4MmN2MjEyayJ9.DKwcxajlq3hrUjNUYI3Sxw';
+    mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
+
+    if (!mapContainerRef.current) return;
 
     mapRef.current = new mapboxgl.Map({
-      container: mapContainerRef.current!,
+      container: mapContainerRef.current,
       center: [-77.03915, 38.90025], // Washington DC
       zoom: 12.5,
       config: {
@@ -43,9 +44,9 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (!selectedStore) return;
+    if (!selectedStore || !mapRef.current) return;
 
-    mapRef.current!.flyTo({
+    mapRef.current.flyTo({
       center: [
         selectedStore.geometry.coordinates[0],
         selectedStore.geometry.coordinates[1],
