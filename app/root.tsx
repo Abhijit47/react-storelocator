@@ -11,6 +11,8 @@ import type { Route } from './+types/root';
 import './app.css';
 import { Toaster } from './components/ui/sonner';
 
+import 'mapbox-gl/dist/mapbox-gl.css';
+
 export const links: Route.LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
   {
