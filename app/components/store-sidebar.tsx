@@ -1,4 +1,5 @@
 import { AppSidebar } from './app-sidebar';
+import { ModeToggle } from './mode-toggle';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -34,6 +35,10 @@ export default function StoreSidebar({
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
+          </div>
+
+          <div className={'ml-auto pr-4'}>
+            <ModeToggle />
           </div>
         </header>
         {children}
