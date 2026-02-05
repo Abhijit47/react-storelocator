@@ -87,8 +87,11 @@ export default function Home() {
 
   return (
     <StoreSidebar>
-      {!mapLoaded && <Skeleton className={'min-h-dvh w-full animate-pulse'} />}
-      <div className='flex flex-1 flex-col h-full gap-4 p-4'>
+      <div className='relative flex flex-1 flex-col h-full gap-4 p-4'>
+        {!mapLoaded && (
+          <Skeleton className='absolute inset-0 h-full w-full animate-pulse' />
+        )}
+
         <div className='h-full w-full' ref={mapContainerRef} />
 
         {mapLoaded &&
