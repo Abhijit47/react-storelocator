@@ -1,16 +1,8 @@
 import { useEffect, useRef } from 'react';
+import { useStoreContext } from '~/contexts/store-context';
 
-interface SidebarProps {
-  stores: StoreFeature[];
-  selectedStore: StoreFeature | null;
-  setSelectedStore: Function;
-}
-
-export default function SidebarDemo({
-  stores,
-  selectedStore,
-  setSelectedStore,
-}: SidebarProps) {
+export default function SidebarDemo() {
+  const { stores, selectedStore, onSelectedStore } = useStoreContext();
   const storeRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   // Scroll to the active location when it changes (desktop only)
@@ -45,7 +37,7 @@ export default function SidebarDemo({
             ref={(el) => {
               storeRefs.current[store.properties.name] = el;
             }}
-            onClick={() => setSelectedStore(store)}
+            onClick={() => onSelectedStore(store)}
             className={`${isSelected ? 'bg-white' : 'bg-transparent'} hover:bg-white/50 relative flex flex-col my-4 border border-sg-green rounded-lg transition-all duration-200 cursor-pointer p-4`}>
             <h4 className='mb-2 text-sg-green text-xl font-semibold'>
               {store.properties.name}
