@@ -65,7 +65,7 @@ export default function CustomMarker({ map, feature }: MarkerProps) {
               }}>
               <PopoverTrigger asChild>
                 <Button
-                  variant='outline'
+                  variant='ghost'
                   size={'icon-xs'}
                   className={'rounded-full!'}
                   onClick={() => onSelectedStore(feature)}>
