@@ -23,8 +23,7 @@ export default function Home() {
   const { stores, selectedStore } = useStoreContext();
 
   useEffect(() => {
-    mapboxgl.accessToken =
-      'pk.eyJ1IjoiYWswMDciLCJhIjoiY2xkOW82MXkyMGE4aDNwc3o4MmN2MjEyayJ9.DKwcxajlq3hrUjNUYI3Sxw';
+    mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 
     mapRef.current = new mapboxgl.Map({
       container: mapContainerRef.current!,
@@ -122,7 +121,7 @@ function Marker({ feature, map }: { feature: StoreFeature; map: Map }) {
     return () => {
       markerRef.current?.remove();
     };
-  }, []);
+  }, [map, geometry.coordinates]);
 
   return (
     <>
@@ -134,8 +133,8 @@ function Marker({ feature, map }: { feature: StoreFeature; map: Map }) {
           }
           style={{
             backgroundImage: isSelected
-              ? 'url("./sg-marker-selected.svg")'
-              : 'url("./sg-marker.svg")',
+              ? 'url("/markers/sg-marker-selected.svg")'
+              : 'url("/markers/sg-marker.svg")',
           }}></div>,
         contentRef.current,
       )}

@@ -7,7 +7,9 @@ type StoreContextType = {
   onSelectedStore: (store: StoreFeature | null) => void;
 };
 
-export const StoreContext = createContext({} as StoreContextType);
+export const StoreContext = createContext<StoreContextType | undefined>(
+  undefined,
+);
 
 export function StoreContextProvider({
   children,

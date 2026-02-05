@@ -1,12 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useStoreContext } from '~/contexts/store-context';
 
-interface SidebarProps {
-  stores: StoreFeature[];
-  selectedStore: StoreFeature | null;
-  setSelectedStore: Function;
-}
-
 export default function SidebarDemo() {
   const { stores, selectedStore, onSelectedStore } = useStoreContext();
   const storeRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
