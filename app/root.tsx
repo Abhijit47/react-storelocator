@@ -12,6 +12,8 @@ import './app.css';
 import { Toaster } from './components/ui/sonner';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
+import Navbar from './components/navbar';
+import { StoreContextProvider } from './contexts/store-context';
 
 export const links: Route.LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -36,7 +38,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        {children}
+        <Navbar />
+        <StoreContextProvider>{children}</StoreContextProvider>
         <ScrollRestoration />
         <Scripts />
         <Toaster />
