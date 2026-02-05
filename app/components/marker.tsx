@@ -3,6 +3,17 @@ import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useStoreContext } from '~/contexts/store-context';
 
+import {
+  Popover,
+  PopoverContent,
+  PopoverDescription,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverTrigger,
+} from '~/components/ui/popover';
+import { Button } from './ui/button';
+import { Separator } from './ui/separator';
+
 interface MarkerProps {
   feature: StoreFeature;
   map: Map;
@@ -11,9 +22,9 @@ interface MarkerProps {
 export default function CustomMarker({ map, feature }: MarkerProps) {
   const { geometry } = feature;
 
-  const contentRef = useRef<HTMLDivElement>(null);
-  const markerRef = useRef<Marker | null>(null);
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
+
+  const markerRef = useRef<Marker | null>(null);
 
   const { selectedStore, onSelectedStore } = useStoreContext();
 
@@ -47,17 +58,60 @@ export default function CustomMarker({ map, feature }: MarkerProps) {
     <>
       {container
         ? createPortal(
-            <div
-              onClick={() => onSelectedStore(feature)}
-              className={
-                'bg-contain bg-no-repeat cursor-pointer transition w-[37px] h-[40px]'
-              }
-              style={{
-                backgroundImage: isSelected
-                  ? 'url("/markers/sg-marker-selected.svg")'
-                  : 'url("/markers/sg-marker.svg")',
-              }}
-              ref={contentRef}></div>,
+            <Popover
+              open={isSelected}
+              onOpenChange={(open) => {
+                if (!open) onSelectedStore(null);
+              }}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant='outline'
+                  size={'icon-xs'}
+                  className={'rounded-full!'}
+                  onClick={() => onSelectedStore(feature)}>
+                  {isSelected ? (
+                    <img
+                      src='/markers/sg-marker-selected.svg'
+                      alt={`Marker for ${feature.properties.name}`}
+                      className={'h-full w-full'}
+                    />
+                  ) : (
+                    <img
+                      src='/markers/sg-marker.svg'
+                      alt={`Marker for ${feature.properties.name}`}
+                      className={'h-full w-full'}
+                    />
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent>
+                <PopoverHeader>
+                  <PopoverTitle>
+                    <h3 className='text-lg font-medium'>
+                      {feature.properties.name}
+                    </h3>
+                  </PopoverTitle>
+                  <Separator />
+                  <PopoverDescription>
+                    <span className='block text-sm text-muted-foreground'>
+                      {feature.properties.address}
+                    </span>
+                    <span className='block text-sm text-muted-foreground'>
+                      {feature.properties.city}
+                    </span>
+                    <span className='block text-sm text-muted-foreground'>
+                      {feature.properties.country}
+                    </span>
+                    <span className='block text-sm text-muted-foreground'>
+                      {feature.properties.state}
+                    </span>
+                    <span className='block text-sm text-muted-foreground'>
+                      {feature.properties.phone}
+                    </span>
+                  </PopoverDescription>
+                </PopoverHeader>
+              </PopoverContent>
+            </Popover>,
             container,
           )
         : null}
