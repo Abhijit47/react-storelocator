@@ -1,21 +1,27 @@
 import mapboxgl, { type Map } from 'mapbox-gl';
 import { useEffect, useRef, useState } from 'react';
-// import Marker from '~/components/marker';
-import { createPortal } from 'react-dom';
-import SidebarDemo from '~/components/sidebar-demo';
+import CustomMarker from '~/components/marker';
+import StoreSidebar from '~/components/store-sidebar';
+import { Skeleton } from '~/components/ui/skeleton';
 import { useStoreContext } from '~/contexts/store-context';
 import type { Route } from './+types/home';
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: 'New React Router App' },
-    { name: 'description', content: 'Welcome to React Router!' },
+    {
+      title: 'Store Locator with React Router and Mapbox GL JS',
+    },
+    {
+      name: 'description',
+      content:
+        'A store locator application built with React Router, Mapbox GL JS, and TypeScript.',
+    },
   ];
 }
 
 export default function Home() {
   const [mapLoaded, setMapLoaded] = useState(false);
-  // const [map, setMap] = useState<Map | null>(null);
+  const [map, setMap] = useState<Map | null>(null);
 
   const mapRef = useRef<Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -23,53 +29,48 @@ export default function Home() {
   const { stores, selectedStore } = useStoreContext();
 
   useEffect(() => {
+    // Set your Mapbox access token
     mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 
-    mapRef.current = new mapboxgl.Map({
-      container: mapContainerRef.current!,
-      center: [-77.03915, 38.90025],
+    if (!mapContainerRef.current) return;
+
+    const newMap = new mapboxgl.Map({
+      container: mapContainerRef.current,
+      center: [-77.03915, 38.90025], // Washington DC
       zoom: 12.5,
+      config: {
+        basemap: { theme: 'faded' },
+      },
       style: 'mapbox://styles/mapbox/light-v11',
+      devtools: true, // Enable Mapbox GL JS devtools
+      accessToken: import.meta.env.VITE_MAPBOX_ACCESS_TOKEN,
+      trackResize: true,
+      respectPrefersReducedMotion: true,
     });
 
-    mapRef.current.on('load', () => {
+    // Navigation controls (zoom in/out)
+    newMap.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+    // Scale control (distance measurement)
+    newMap.addControl(new mapboxgl.ScaleControl(), 'bottom-right');
+
+    // Fullscreen control
+    newMap.addControl(new mapboxgl.FullscreenControl(), 'top-left');
+
+    // Geolocate control (user location)
+    newMap.addControl(new mapboxgl.GeolocateControl(), 'top-left');
+
+    newMap.on('load', () => {
       setMapLoaded(true);
     });
 
+    mapRef.current = newMap;
+    setMap(newMap);
+
     return () => {
-      mapRef.current?.remove();
+      newMap.remove();
     };
   }, []);
-
-  // useEffect(() => {
-  //   // Set your Mapbox access token
-  //   mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
-
-  //   if (!mapContainerRef.current) return;
-
-  //   const newMap = new mapboxgl.Map({
-  //     container: mapContainerRef.current,
-  //     center: [-77.03915, 38.90025], // Washington DC
-  //     zoom: 12.5,
-  //     config: {
-  //       basemap: { theme: 'faded' },
-  //     },
-  //     style: 'mapbox://styles/mapbox/light-v11',
-  //   });
-
-  //   newMap.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
-  //   newMap.on('load', () => {
-  //     setMapLoaded(true);
-  //   });
-
-  //   mapRef.current = newMap;
-  //   setMap(newMap);
-
-  //   return () => {
-  //     newMap.remove();
-  //   };
-  // }, []);
 
   useEffect(() => {
     if (!selectedStore || !mapRef.current) return;
@@ -85,59 +86,21 @@ export default function Home() {
   }, [selectedStore]);
 
   return (
-    <div className='flex absolute top-0 left-0 right-0 bottom-0 h-full w-full'>
-      <SidebarDemo />
-      {/* Map container */}
-      <div className='w-3/4'>
+    <StoreSidebar>
+      {!mapLoaded && <Skeleton className={'min-h-dvh w-full animate-pulse'} />}
+      <div className='flex flex-1 flex-col h-full gap-4 p-4'>
         <div className='h-full w-full' ref={mapContainerRef} />
 
-        {/* Marker */}
         {mapLoaded &&
+          map &&
           stores.map((store) => (
-            <Marker
+            <CustomMarker
               key={store.properties.name}
               feature={store}
-              map={mapRef.current!}
+              map={map}
             />
           ))}
       </div>
-    </div>
-  );
-}
-
-function Marker({ feature, map }: { feature: StoreFeature; map: Map }) {
-  const { geometry } = feature;
-
-  const { selectedStore, onSelectedStore } = useStoreContext();
-
-  const contentRef = useRef(document.createElement('div'));
-  const markerRef = useRef<mapboxgl.Marker | null>(null);
-  const isSelected = feature.properties.name === selectedStore?.properties.name;
-  useEffect(() => {
-    markerRef.current = new mapboxgl.Marker(contentRef.current)
-      .setLngLat([geometry.coordinates[0], geometry.coordinates[1]])
-      .addTo(map);
-
-    return () => {
-      markerRef.current?.remove();
-    };
-  }, [map, geometry.coordinates]);
-
-  return (
-    <>
-      {createPortal(
-        <div
-          onClick={() => onSelectedStore(feature)}
-          className={
-            'bg-contain bg-no-repeat cursor-pointer transition w-[37px] h-[40px]'
-          }
-          style={{
-            backgroundImage: isSelected
-              ? 'url("/markers/sg-marker-selected.svg")'
-              : 'url("/markers/sg-marker.svg")',
-          }}></div>,
-        contentRef.current,
-      )}
-    </>
+    </StoreSidebar>
   );
 }

@@ -1,10 +1,18 @@
-import { createContext, useContext, useState } from 'react';
+import {
+  createContext,
+  useContext,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from 'react';
 import { storeLocations } from '~/constants';
 
 type StoreContextType = {
   stores: StoreFeature[];
   selectedStore: StoreFeature | null;
   onSelectedStore: (store: StoreFeature | null) => void;
+  isPopOverOpen: boolean;
+  setIsPopOverOpen: Dispatch<SetStateAction<boolean>>;
 };
 
 export const StoreContext = createContext<StoreContextType | undefined>(
@@ -19,9 +27,11 @@ export function StoreContextProvider({
   const stores = storeLocations;
 
   const [selectedStore, setSelectedStore] = useState<StoreFeature | null>(null);
+  const [isPopOverOpen, setIsPopOverOpen] = useState(false);
 
   function handleSetSelectedStore(store: StoreFeature | null) {
     setSelectedStore(store);
+    setIsPopOverOpen(true);
   }
 
   return (
@@ -30,6 +40,8 @@ export function StoreContextProvider({
         stores,
         selectedStore,
         onSelectedStore: handleSetSelectedStore,
+        isPopOverOpen,
+        setIsPopOverOpen,
       }}>
       {children}
     </StoreContext.Provider>
