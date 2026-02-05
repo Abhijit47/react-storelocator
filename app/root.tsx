@@ -76,7 +76,7 @@ export default function AppWithProviders() {
   const data = useLoaderData<typeof loader>();
 
   useEffect(() => {
-    if (typeof window === undefined) return;
+    if (typeof window === 'undefined') return;
   }, []);
 
   return (
